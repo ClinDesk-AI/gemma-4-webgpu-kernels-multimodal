@@ -248,6 +248,28 @@ export async function fetchSafetensorsHeader(
   url: string,
   signal?: AbortSignal,
 ): Promise<SafetensorsHeader> {
+  const cache = await openMetadataCache();
+  const cacheKey = safetensorsHeaderCacheRequest(url);
+  const cached = await cache?.match(cacheKey).catch(() => undefined);
+  if (cached) {
+    try {
+      const parsed = record(JSON.parse(await cached.text()));
+      const headerBytes = Number(parsed.headerBytes);
+      const tensorRecords = record(parsed.tensors);
+      if (Number.isInteger(headerBytes) && headerBytes > 0) {
+        const tensors = Object.fromEntries(
+          Object.entries(tensorRecords).map(([name, value]) => [
+            name,
+            safetensorsTensorInfo(name, value),
+          ]),
+        );
+        return { headerBytes, tensors };
+      }
+    } catch {
+      // Ignore malformed cache entries and refresh from the source range.
+    }
+  }
+
   const prefix = await fetchRange(url, 0, 7, signal);
   if (prefix.byteLength !== 8) {
     throw new Error(`Expected 8-byte safetensors header prefix, got ${prefix.byteLength} bytes.`);
@@ -267,7 +289,22 @@ export async function fetchSafetensorsHeader(
       .filter(([name]) => name !== "__metadata__")
       .map(([name, value]) => [name, safetensorsTensorInfo(name, value)]),
   );
-  return { headerBytes, tensors };
+  const result = { headerBytes, tensors };
+  await cache?.put(cacheKey, new Response(JSON.stringify(result), {
+    headers: {
+      "content-type": "application/json",
+      "x-clindesk-source": url,
+      "x-clindesk-kind": "safetensors-header",
+    },
+  })).catch(() => undefined);
+  return result;
+}
+
+function safetensorsHeaderCacheRequest(sourceUrl: string): Request {
+  const origin = globalThis.location?.origin ?? "https://app.clindesk.ai";
+  const url = new URL("/__clindesk_cache__/gemma4-media-header", origin);
+  url.searchParams.set("source", sourceUrl);
+  return new Request(url.toString());
 }
 
 export function safetensorsTensorInfo(name: string, value: unknown): SafetensorsTensorInfo {
