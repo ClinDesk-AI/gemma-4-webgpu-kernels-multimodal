@@ -13,6 +13,7 @@ const staticProbe = run("pnpm", ["run", "probe:static"]);
 const pack = run("pnpm", ["pack", "--dry-run", "--json"]);
 const packReport = parsePackJson(pack.stdoutText);
 const packedFiles = new Set((packReport.files ?? []).map((file) => file.path));
+const git = inspectGitState();
 
 const requiredPackedFiles = [
   "LICENSE",
@@ -59,6 +60,14 @@ const checks = [
   check("pack-version-matches-package", packReport.version === packageJson.version, packReport.version),
   check("pack-includes-required-files", missingPackedFiles.length === 0, missingPackedFiles),
   check("pack-excludes-source-and-artifacts", forbiddenPackedFiles.length === 0, forbiddenPackedFiles),
+  check("git-working-tree-clean", git.clean === true, git.status),
+  check("git-branch-main", git.branch === "main", git.branch),
+  check("git-origin-is-clindesk-repo", git.originUrl === "https://github.com/ClinDesk-AI/gemma-4-webgpu-kernels-multimodal.git", git.originUrl),
+  check("git-head-pushed-to-upstream", git.upstream === "origin/main" && git.ahead === 0, {
+    upstream: git.upstream,
+    ahead: git.ahead,
+    behind: git.behind,
+  }),
 ];
 
 const report = {
@@ -85,6 +94,7 @@ const report = {
     missingPackedFiles,
     forbiddenPackedFiles,
   },
+  git,
   checks,
 };
 
@@ -129,6 +139,26 @@ function commandEvidence(result) {
     stdoutTail: result.stdoutTail,
     stderrTail: result.stderrTail,
     summary: result.summary,
+  };
+}
+
+function inspectGitState() {
+  const status = run("git", ["status", "--porcelain=v1"]);
+  const branch = run("git", ["rev-parse", "--abbrev-ref", "HEAD"]);
+  const head = run("git", ["rev-parse", "HEAD"]);
+  const origin = run("git", ["remote", "get-url", "origin"]);
+  const upstream = run("git", ["rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}"]);
+  const ahead = upstream.ok ? run("git", ["rev-list", "--count", "@{u}..HEAD"]) : null;
+  const behind = upstream.ok ? run("git", ["rev-list", "--count", "HEAD..@{u}"]) : null;
+  return {
+    clean: status.ok && status.stdoutText.trim().length === 0,
+    status: status.stdoutText.trim(),
+    branch: branch.ok ? branch.stdoutText.trim() : "",
+    head: head.ok ? head.stdoutText.trim() : "",
+    originUrl: origin.ok ? origin.stdoutText.trim() : "",
+    upstream: upstream.ok ? upstream.stdoutText.trim() : "",
+    ahead: ahead?.ok ? Number(ahead.stdoutText.trim()) : null,
+    behind: behind?.ok ? Number(behind.stdoutText.trim()) : null,
   };
 }
 
