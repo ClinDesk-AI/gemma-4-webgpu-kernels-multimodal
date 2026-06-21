@@ -135,6 +135,24 @@ The library uses the browser Cache API for model metadata and tensor slices. App
 should surface a clear onboarding step before the first model download and should
 provide a way to clear local model data.
 
+## Release
+
+This repository uses pnpm for package management and publishing.
+
+```sh
+pnpm install --frozen-lockfile
+pnpm build
+pnpm probe:static
+pnpm publish --access public
+```
+
+If the registry asks for a one-time password in a non-interactive environment,
+publish with:
+
+```sh
+pnpm publish --access public --otp <code>
+```
+
 ## Provenance
 
 This package is a ClinDesk-authored extraction from the browser prototype. It was

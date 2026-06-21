@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Browser-native WebGPU media kernels for Gemma 4 E2B mobile-transformers image and audio embeddings.",
   "type": "module",
+  "packageManager": "pnpm@11.8.0",
   "license": "MIT",
   "author": "ClinDesk LLC",
   "homepage": "https://github.com/ClinDesk-AI/gemma-4-webgpu-kernels-multimodal#readme",
