@@ -1,0 +1,60 @@
+{
+  "name": "@clindesk/gemma-4-webgpu-kernels-multimodal",
+  "version": "0.1.0",
+  "description": "Browser-native WebGPU media kernels for Gemma 4 E2B mobile-transformers image and audio embeddings.",
+  "type": "module",
+  "license": "MIT",
+  "author": "ClinDesk LLC",
+  "homepage": "https://github.com/ClinDesk-AI/gemma-4-webgpu-kernels-multimodal#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ClinDesk-AI/gemma-4-webgpu-kernels-multimodal.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ClinDesk-AI/gemma-4-webgpu-kernels-multimodal/issues"
+  },
+  "keywords": [
+    "gemma",
+    "gemma-4",
+    "webgpu",
+    "multimodal",
+    "browser",
+    "audio",
+    "vision"
+  ],
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./probes": {
+      "types": "./dist/probes/index.d.ts",
+      "default": "./dist/probes/index.js"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "NOTICE",
+    "LICENSE"
+  ],
+  "scripts": {
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc -p tsconfig.json",
+    "probe:static": "node scripts/static-probe.mjs",
+    "prepublishOnly": "pnpm clean && pnpm build && pnpm probe:static"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@webgpu/types": "^0.1.70",
+    "typescript": "^5.8.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

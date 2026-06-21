@@ -1,0 +1,23 @@
+gemma-4-webgpu-kernels-multimodal
+Copyright (c) 2026 ClinDesk LLC
+
+This package was created by extracting ClinDesk browser prototype code into a
+standalone browser library.
+
+Upstream references and credits:
+
+- webml-community/gemma-4-webgpu-kernels
+  Hugging Face Space: https://huggingface.co/spaces/webml-community/gemma-4-webgpu-kernels
+  Listed contributor on Hugging Face at creation time: Xenova
+  The Space provided the public proof point for running the Gemma 4 E2B QAT
+  mobile-transformers browser/WebGPU path.
+
+- google/gemma-4-E2B-it-qat-mobile-transformers
+  Hugging Face model repository: https://huggingface.co/google/gemma-4-E2B-it-qat-mobile-transformers
+  Authors listed by the model card: Google DeepMind
+  The package downloads model metadata and tensor slices from this repository at
+  runtime when used in a browser.
+
+This package does not include model weights. Users are responsible for complying
+with the model repository license, Hugging Face terms, and any applicable Google
+terms for their use case.
