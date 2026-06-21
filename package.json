@@ -45,6 +45,7 @@
     "typecheck": "tsc --noEmit",
     "build": "tsc -p tsconfig.json",
     "probe:static": "node scripts/static-probe.mjs",
+    "prepare": "tsc -p tsconfig.json",
     "prepublishOnly": "pnpm clean && pnpm build && pnpm probe:static"
   },
   "publishConfig": {
