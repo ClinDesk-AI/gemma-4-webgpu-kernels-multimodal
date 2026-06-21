@@ -143,6 +143,7 @@ This repository uses pnpm for package management and publishing.
 pnpm install --frozen-lockfile
 pnpm build
 pnpm probe:static
+pnpm probe:release
 pnpm publish --access public
 ```
 

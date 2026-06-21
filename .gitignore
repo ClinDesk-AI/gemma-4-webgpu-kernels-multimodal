@@ -1,5 +1,6 @@
 dist/
 node_modules/
+.release/
 .DS_Store
 *.tsbuildinfo
 pnpm-debug.log*
